@@ -1,46 +1,52 @@
 +++
-date = '2024-12-11T01:06:45+01:00'
+date = '2024-12-11'
 draft = true
-title = 'Np Completeness'
+title = 'NP Vollständigkeit'
 +++
 
-# Traveling Salesman
+{{< mathjax >}}
+
+NP-Hard und NP-Complete (NP-Schwer und NP-Vollständig) sind eine der wichtigsten Komplexitätsklassen in der Informatik. Ermöglicht durch Cook's arbeiten zu der Praxis des _Reduzierens_ und des finden eines initialen NP-Vollständigen Problems (1971)[^1].
+
+Schauen wir uns zunächst eines der bekannten NP-Vollständigen Probleme an. Das
+**Rundreiseproblem**
+> **Definition Rundreiseproblem:**
+> - **gegeben** Eine Menge aus Entfernungen mit $n \times n$ Elementen und eine Zahl $k$. Jedes Element $M_{i,j}$ beschreibt dabei die Entfernung von einer Stadt Nummer $i$ zu Stadt Nummer $j$.
+> - **gefragt** Gibt es eine "_Rundreise_" deren Wegstrecke kleiner als $k$ ist. Wichtig hierbei, dass jede Stadt genau einmal besucht wird.
+> Also gibt es eine Permutation $\pi$, so dass gilt: $(\sum_{i=1}^{n-1} M_{\pi(i), \pi{i+1}}) + M_{\pi(n), \pi(1)} \leq k$.
+
+Eine Funktion, die dieses Rundreiseproblem berechnet kann beispielsweise mit folgender Funktion gelöst werden:
 
 ```Java
-int travelingSalesman(int currentNode, int distanceTraveled, int[] visitedNodes){
-    if(visitedNodes.length == numNodes) return distanceTraveled;
-    for(i = 0; i < numNodes; i++){
-        int nextNode = i;
-        int totalDistance = distanceTraveled + distance(currentNode, i);
-        return 
-    }
-}
-```
-
-Ein Graph mit 5 Knoten kann auch mit fünf ineinander verschachtelten For-Schleifen berechnet werden.
-
-```Java
-int shortestDistance = -1;
-int[] shortestPath = []
-for(i in {1,2,3,4,5}){
-    for(i2 in {1,2,3,4,5}){
-        for(i3 in {1,2,3,4,5}){
-            ...
-            int totalDistance = dikstra(i1, i2, i3, i4, i5)
-            if(totalDistance < shortestDistance){
-                shortestDistance = totalDistance
-                shortestPath = [i1,i2,i3,i4,i5]
+int k = ...;
+int[][] M = ...; // Matrix aus n x n Entfernungen
+for(i1 in {1,2,3,4,5 ... n}){
+    for(i2 in {1,2,3,4,5 ... n}){
+        for(i3 in {1,2,3,4,5 ... n}){
+          ...
+          for(iN in {1,2,3,4,5 ... n}){
+            int distance = M[i1][i2] + M[i2][i3] + ... + M[iN][i1];
+            if(distance < k){
+                return true;
             }
         }   
     }  
 }
+return false;
 ```
 
-Die Frage ist nun, gibt es auch einen Algorithmus, welcher das Traveling Salesman Problem in Polynomieller Laufzeit löst.
+Diese Funktion hat allerdings ein Laufzeitverhalten von $O(n^n)$.
+Die Rechenzeit steigt exponentiell mit der Anzahl der Städte.
 
-Um diese Frage zu klären gibt es die Cook 1971 eingeführte Aufteilung in P und NP schwere Probleme.
-P bedetet eine deterministische Turingmaschine kann es in O(n^x) lösen.
-Es gibt ein Polynom p mit p(n)<= Anzahl Schritte einer Turingmaschine mit eingabe der Länge n.
+Die Frage ist nun, ob es auch einen Algorithmus gibt, welcher das Rundreiseproblem in Polynomialer Laufzeit löst.
+
+Um diese Frage zu klären gibt es die durch Cook 1971 eingeführte Aufteilung in P und NP schwere Probleme.
+
+### P und NP
+
+**P** bedetet eine deterministische Turingmaschine kann es in $O(n^x)$ lösen.
+Oder anders formuliert:
+Es gibt ein Polynom[^3] $p$ und eine Deterministische Turingmaschine $M$ mit der gilt: $p(n) \leq $ {Anzahl der Rechenschritte von $M$ auf einer Eingabe der Länge $n$}.
 
 NP schwere Probleme sind Probleme für die es eine nichtdeterministische Turingmaschine gibt, welche es in p(n) Schritten lösen kann.
 Die Klasse P enthält alle Probleme bei denen dies auch mit einer deterministischen Turingmaschine möglich ist.
@@ -53,9 +59,41 @@ Dies konnte aber nie bewiesen werden. Es steht immer noch aus ob P =/= NP.
 ## NP-Hardness
 Wie zeigen wir, ob ein Problem NP-schwer ist?
 
-- Polynomielle Reduzierung
+-----
+#### Polynomiale Reduzierung
+**Definition:**
+Seien A $\subseteq \Sigma^* $ und B $\subseteq \Gamma^* $ Sprachen.
+Dann heißt _"A auf B polynomial reduzierbar"_ - ausgedrückt A $\leq_p$ B -
+falls es eine totale und mit polynomialer Komplexität berechnbare Funktion $f : \Sigma^* \to \Gamma^* $ gibt, so dass für alle $x \in \Sigma^*$ gilt:
 
-%TODO: Definition mit <==> ausführen!
+- $x \in$ A $\implies$ $f(x) \in$ B
+- $f(x) \in$ B $\implies$ $x \in$ A 
+
+-----
+
+#### NP-Schwer und NP-Vollständig
+-----
+**Definition** TODO
+
+----
+
+* $\leq_p$ ist transitiv
+  - A $\leq_p$ B und B $\leq_p$ C $\implies$ A $\leq_p$ C
+* Daher: Um zu zeigen, dass ein Problem B NP-Schwer ist, reicht es eine polynomiale Reduktion auf ein anderes NP-schweres Problem A zu finden (B $\leq_p$ A)
+  * Da $\leq_p$ transitiv ist, können somit alle NP-Schweren Probleme auf B reduziert werden
+* der Trick ist es, ein NP-Vollständiges Problem als initiales Problem zu finden.
+    - anschließend können alle anderen Probleme auf dieses reduziert werden.
+    - Dies ist das SAT Problem und wurde von Cook bewiesen (1971)
+
+_Bemerkung:_
+
+* NP-Schwer bedeutet, ein Problem ist mindestens so schwer wie alle Probleme, welche von einer Nichtdeterministischen Turingmaschine in polynomialer Laufzeit berechenbar sind.
+  * es könnte allerdings auch schwerer sein
+  * Um NP-Vollständigkeit zu zeigen reicht es meist aus zu zeigen, dass das Problem NP-Schwer ist und in NP enthalten ist.
+  * _Erinnerung:_ Die Klasse NP enthält alle Probleme, welche mit einer Nichtdeterministischen Turinmaschine in polynomialer Laufzeit berechenbar sind.
+
+#### P = NP Problem
+TODO: Satz aus Schöning!
 
 Falls A \\(\leq_p\\) B und B \\(\in\\) NP, dann ist auch A \\(\in\\) NP.
 
@@ -64,9 +102,7 @@ Falls A \\(\leq_p\\) B und B \\(\in\\) P, dann ist auch A \\(\in\\) P.
 - Es stellt sich heraus, dass alle NP-schweren Probleme aufeinander reduzierbar sind.
 - findet man einen effektiven Algorithmus für ein NP-schweres Problem, so findet man einen für alle NP-schweren Probleme. Dann wär P = NP
     - der Grund ist die transitivität der polynomiellen Reduzierung
-- der Trick ist es, ein NP-Vollständiges Problem als initiales Problem zu finden.
-    - anschließend können alle anderen Probleme auf dieses reduziert werden.
-    - Dies ist das SAT Problem und wurde von Cook bewiesen (1971)
+
 
 ### SAT Problem
 Das Erfüllbarkeitsproblem der Aussagenlogik (kurz SAT) ist das folgende.
@@ -84,21 +120,38 @@ Wir zeigen, dass sich SAT auf _Typinferenz für Java_ reduzieren lässt.
 % TODO: Wir müssen zeigen, dass die beiden Problem equivalent sind
 
 ```Java
-  class True extends Object{
-    False not(){ return new False(); }
-    True and(True t){ return t; }
-    False and(False f){ return f; }
-    True or(Object any){ return this; }
-  }
-  class False extends Object{
-    True not(){ return new True(); }
-    False and(Object any){ return this; }
-    True of(True t){ return t;}
-  }
+class True extends Object{
+  False not(){ return new False(); }
+  True and(True t){ return t; }
+  False and(False f){ return f; }
+  True or(Object any){ return this; }
+}
+class False extends Object{
+  True not(){ return new True(); }
+  False and(Object any){ return this; }
+  True of(True t){ return t;}
+}
 
-  class SATEncoding extends Object{
-    True sat(v1, v2, v3, o1, o2){
-      return o1.or(v1, o2.and(v2, v3.not()));
-    }
+class SATEncoding extends Object{
+  True sat(v1, v2, v3, o1, o2){
+    return o1.or(v1, o2.and(v2, v3.not()));
   }
+}
 ```
+
+### NP-Schwere Probleme die nicht in NP sind
+Es gibt Probleme, die zwar NP-Schwer sind, allerdings nicht in NP liegen,
+also "_schwerer_" als NP-Vollständige Probleme sein müssen.
+
+* So sind Unentscheidbare Probleme generell nicht in NP:
+  - Eine deterministische Turinmaschine kann eine NDTM simulieren.
+  - könnte eine NDTM eine unberechenbares Problem in polynomialer Laufzeit lösen, so könnte dies auche eine DTM in endlicher Zeit.
+
+
+- **Beispiel:** Das Wortproblem für Typ-0 Sprachen:
+  * nicht in NP, da es unentscheidbar ist
+  * allerdings NP-Schwer, da SAT durch eine Typ-0 Grammatik bzw. einer Turingmaschine ausgerechnet werden kann und somit eine Untermenge des Wortproblems für Typ-0 Sprachen ist.
+
+[^1]: Stephen A. Cook. 1971. The complexity of theorem-proving procedures. In Proceedings of the third annual ACM symposium on Theory of computing (STOC '71). Association for Computing Machinery, New York, NY, USA, 151–158. https://doi.org/10.1145/800157.805047
+
+[^3]: Ein Polynom ist eine Funktion der Form $a x^n + bx^{n-1} + .. + cx + d$

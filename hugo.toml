@@ -3,7 +3,6 @@ languageCode = 'en-us'
 title = 'My New Hugo Site'
 theme = 'ananke'
 
-
 [markup]
   [markup.goldmark]
     [markup.goldmark.extensions]
@@ -11,7 +10,5 @@ theme = 'ananke'
         enable = true
         [markup.goldmark.extensions.passthrough.delimiters]
           block = [['\[', '\]'], ['$$', '$$']]
-          inline = [['\(', '\)']]
-[params]
-  math = true
+          inline = [['\(', '\)'], ['$', '$']]
 
